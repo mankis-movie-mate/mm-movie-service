@@ -1,0 +1,31 @@
+{
+  "name": "mm-movie-service",
+  "version": "0.0.0",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.10.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.2"
+  },
+  "lint-staged": {
+    "**/*.{js,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

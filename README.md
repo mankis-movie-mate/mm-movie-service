@@ -1,2 +1,3 @@
 # mm-movie-service
-Stores movie data, genres, and metadata.  
+
+Stores movie data, genres, and metadata.
