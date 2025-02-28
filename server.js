@@ -1,4 +1,8 @@
 const app = require('./app');
-const { port } = require('./app/config');
+const { port, base_url } = require('./app/config/config');
+require('./app/config/db.js');
+const logger = require('./app/middleware/logger');
 
-app.listen(port);
+app.listen(port, () => {
+  logger.info(`Server started at: http://localhost:${port}${base_url}`);
+});
