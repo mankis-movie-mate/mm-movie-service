@@ -1,31 +1,43 @@
 const mongoose = require('mongoose');
 const Genre = require('./Genre');
 
-const castSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-});
+const castSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+  },
+  { _id: false }
+);
 
-const directorSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-});
+const directorSchema = new mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+  },
+  { _id: false }
+);
 
-const ratingSchema = new mongoose.Schema({
-  average: { type: Number, default: 0.0 },
-  count: { type: Number, default: 0 },
-});
+const ratingSchema = new mongoose.Schema(
+  {
+    average: { type: Number, default: 0.0 },
+    count: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
 
-const reviewSchema = new mongoose.Schema({
-  user: { type: String, required: true },
-  comment: { type: String, required: true },
-  rating: { type: Number, required: true },
-  dateCreated: { type: Date, default: Date.now },
-});
+const reviewSchema = new mongoose.Schema(
+  {
+    user: { type: String, required: true },
+    comment: { type: String, required: true },
+    rating: { type: Number, required: true },
+    dateCreated: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
 
 const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  genres: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
+  genres: [{ type: String, ref: 'Genre' }],
   director: directorSchema,
   casts: [castSchema],
   synopsis: { type: String },

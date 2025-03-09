@@ -15,10 +15,7 @@ const swaggerOptions = {
         url: `http://localhost:${port}${base_url}`,
       },
     ],
-    tags: [
-      { name: 'Genres', description: 'Operations related to genres' },
-      { name: 'Movies', description: 'Operations related to movies' },
-    ],
+    tags: [{ name: 'Movies', description: 'Operations related to movies' }],
   },
   apis: ['app/route/*.js'],
 };
