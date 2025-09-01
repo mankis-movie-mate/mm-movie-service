@@ -1,6 +1,7 @@
-const dotenv = require('dotenv');
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
-dotenv.config();
 module.exports = {
   host: process.env.MOVIE_MATE_MOVIE_SERVICE_HOST || 'localhost',
   port: process.env.MOVIE_MATE_MOVIE_SERVICE_PORT || '3000',

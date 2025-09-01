@@ -4,7 +4,8 @@
   "private": true,
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "prod": "node server.js"
   },
   "dependencies": {
     "express": "^4.21.2",
