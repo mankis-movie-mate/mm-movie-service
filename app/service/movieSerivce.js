@@ -163,7 +163,19 @@ exports.updateMovie = async (id, updateData) => {
   }
 };
 
-exports.getMovieIdsByGenres = async (genres) => {};
+exports.getMovieIdsByGenres = async (genres) => {
+  if (!Array.isArray(genres) || genres.length === 0) {
+    throw new InvalidInputError(
+      'Genres should be an array and cannot be empty.'
+    );
+  }
+  try {
+    const movies = await Movie.find({ genres: { $in: genres } }).select('_id');
+    return movies.map((m) => m._id);
+  } catch (error) {
+    throw new Error(`Failed to retrieve movie ids by genres ${genres}`);
+  }
+};
 
 exports.deleteMovie = async (id) => {
   const { deletedCount } = await Movie.deleteOne({

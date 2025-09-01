@@ -47,6 +47,10 @@ exports.getMoviesByIds = async (req, res, next) => {
 
 exports.getMovieIdsByGenres = async (req, res, next) => {
   try {
+    const { genres } = req.body;
+    movieLogger.info(`Getting movie ids by genres=[${genres}]`);
+    const ids = await movieService.getMovieIdsByGenres(genres);
+    res.status(200).json(ids);
   } catch (error) {
     next(error);
   }
