@@ -5,11 +5,17 @@ const { swaggerUI, swaggerSpec } = require('./config/swagger');
 const movieRoutes = require('./route/movieRoutes');
 const movieManagementRoutes = require('./route/movieManagementRoutes');
 const errorHandler = require('./middleware/errorHandler');
+const logger = require('./middleware/logger');
 
 app.use(express.json());
 app.use(`${base_url}/docs`, swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use(`${base_url}`, movieRoutes);
 app.use(`${base_url}/manage`, movieManagementRoutes);
+
+app.get('/health', (req, res) => {
+    logger.info('Health check OK');
+    res.send('OK');
+});
 
 // middleware
 app.use(errorHandler);
