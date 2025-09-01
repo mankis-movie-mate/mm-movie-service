@@ -7,7 +7,7 @@ const movieManagementRoutes = require('./route/movieManagementRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 app.use(express.json());
-app.use(`${base_url}/api-docs`, swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+app.use(`${base_url}/docs`, swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use(`${base_url}`, movieRoutes);
 app.use(`${base_url}/manage`, movieManagementRoutes);
 

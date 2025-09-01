@@ -1,4 +1,4 @@
-const { port, base_url } = require('../config/config');
+const { port, base_url, host } = require('../config/config');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 
@@ -12,10 +12,9 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://localhost:${port}${base_url}`,
+        url: `http://${host}:${port}${base_url}`,
       },
     ],
-    tags: [{ name: 'Movies', description: 'Operations related to movies' }],
   },
   apis: ['app/route/*.js'],
 };
