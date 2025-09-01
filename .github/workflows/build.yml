@@ -3,9 +3,6 @@ name: Build movie service
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
       - dev/release-test
 
 jobs:
