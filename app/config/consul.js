@@ -5,11 +5,12 @@ const config = require('./config');
 class Consul {
     constructor(logger) {
         this.logger = logger;
+        this.base_url = config.base_url;
         this.dsHost = config.ds_host;
         this.dsPort = config.ds_port;
         this.serviceHost = config.host;
         this.servicePort = parseInt(config.port);
-        this.serviceName = 'mm-activity-service';
+        this.serviceName = 'mm-movie-service';
         this.serviceId = `${this.serviceName}-${Date.now()}`;
         this.healthCheckUrl = `http://${this.serviceHost}:${this.servicePort}/health`;
         this.checkInterval = '10s';
@@ -23,6 +24,14 @@ class Consul {
             ID: this.serviceId,
             Address: this.serviceHost,
             Port: this.servicePort,
+            Tags: [
+                "traefik.enable=true",
+                `traefik.http.routers.${this.serviceName}.rule=PathPrefix(\`/${this.serviceName}\`)`,
+                `traefik.http.routers.${this.serviceName}.middlewares=mm-movie-rewrite@consulcatalog`,
+                `traefik.http.middlewares.mm-movie-rewrite.replacepathregex.regex=^/${this.serviceName}(.*)`,
+                `traefik.http.middlewares.mm-movie-rewrite.replacepathregex.replacement=${this.base_url}$1`,
+                `traefik.http.services.${this.serviceName}.loadbalancer.server.port=3000`
+            ],
             Check: {
                 HTTP: this.healthCheckUrl,
                 Interval: this.checkInterval,
