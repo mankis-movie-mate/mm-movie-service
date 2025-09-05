@@ -13,25 +13,18 @@ class Consul {
         this.serviceName = 'mm-movie-service';
         this.serviceId = `${this.serviceName}-${Date.now()}`;
         this.healthCheckUrl = `http://${this.serviceHost}:${this.servicePort}/health`;
-        this.checkInterval = '10s';
+        this.checkInterval = '10s'
+        this.tags = config.lb_tags.split('\n').map(line => line.trim()).filter(Boolean);
     }
 
     async register() {
         const consulUrl = `http://${this.dsHost}:${this.dsPort}/v1/agent/service/register`;
-
         const serviceDefinition = {
             Name: this.serviceName,
             ID: this.serviceId,
             Address: this.serviceHost,
             Port: this.servicePort,
-            Tags: [
-                "traefik.enable=true",
-                `traefik.http.routers.${this.serviceName}.rule=PathPrefix(\`/${this.serviceName}\`)`,
-                `traefik.http.routers.${this.serviceName}.middlewares=mm-movie-rewrite@consulcatalog`,
-                `traefik.http.middlewares.mm-movie-rewrite.replacepathregex.regex=^/${this.serviceName}(.*)`,
-                `traefik.http.middlewares.mm-movie-rewrite.replacepathregex.replacement=${this.base_url}$1`,
-                `traefik.http.services.${this.serviceName}.loadbalancer.server.port=3000`
-            ],
+            Tags: this.tags,
             Check: {
                 HTTP: this.healthCheckUrl,
                 Interval: this.checkInterval,
