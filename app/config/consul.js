@@ -14,17 +14,20 @@ class Consul {
         this.serviceId = `${this.serviceName}-${Date.now()}`;
         this.healthCheckUrl = `http://${this.serviceHost}:${this.servicePort}/health`;
         this.checkInterval = '10s'
-        this.tags = config.lb_tags.split('\n').map(line => line.trim()).filter(Boolean);
     }
 
     async register() {
         const consulUrl = `http://${this.dsHost}:${this.dsPort}/v1/agent/service/register`;
+        let tags = [];
+        if (config.lb_tags) {
+            tags = config.lb_tags.split('\n').map(line => line.trim()).filter(Boolean);
+        }
         const serviceDefinition = {
             Name: this.serviceName,
             ID: this.serviceId,
             Address: this.serviceHost,
             Port: this.servicePort,
-            Tags: this.tags,
+            Tags: tags,
             Check: {
                 HTTP: this.healthCheckUrl,
                 Interval: this.checkInterval,
