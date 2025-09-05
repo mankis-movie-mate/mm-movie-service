@@ -17,6 +17,8 @@ app.get('/health', (req, res) => {
     res.send('OK');
 });
 
+app.get(`/docs/swagger.json`, (req, res) => res.send(swaggerSpec));
+
 // middleware
 app.use(errorHandler);
 
