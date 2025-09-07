@@ -41,7 +41,7 @@ router.get('/all', movieController.getAllMovies);
 /**
  * @swagger
  * /all-by-ids:
- *   get:
+ *   post:
  *     tags:
  *       - Movies
  *     summary: Get movies by IDs
@@ -60,12 +60,12 @@ router.get('/all', movieController.getAllMovies);
  *       200:
  *         description: Success
  */
-router.get('/all-by-ids', movieController.getMoviesByIds);
+router.post('/all-by-ids', movieController.getMoviesByIds);
 
 /**
  * @swagger
  * /all-by-genres:
- *   get:
+ *   post:
  *     tags:
  *       - Movies
  *     summary: Get movie IDs by genres
@@ -84,7 +84,7 @@ router.get('/all-by-ids', movieController.getMoviesByIds);
  *       200:
  *         description: Success
  */
-router.get('/all-by-genres', movieController.getMovieIdsByGenres);
+router.post('/all-by-genres', movieController.getMovieIdsByGenres);
 
 /**
  * @swagger
