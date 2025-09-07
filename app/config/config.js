@@ -30,5 +30,6 @@ module.exports = {
   ds_port: process.env.MOVIE_MATE_DISCOVERY_SERVER_PORT || '8500',
   logger_level: process.env.MOVIE_MATE_MOVIE_SERVICE_LOGGER_LEVEL || 'info',
   base_url: process.env.MOVIE_MATE_MOVIE_SERVICE_BASE_URL,
-  lb_tags: process.env.MOVIE_MATE_MOVIE_SERVICE_LB_TAGS
+  lb_tags: process.env.MOVIE_MATE_MOVIE_SERVICE_LB_TAGS,
+  allowed_origins: process.env.MOVIE_MATE_MOVIE_SERVICE_ALLOWED_ORIGINS
 };
