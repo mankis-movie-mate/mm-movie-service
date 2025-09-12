@@ -1,6 +1,7 @@
+// File: ./Consul.js
+
 const axios = require('axios');
 const config = require('./config');
-
 
 class Consul {
     constructor(logger) {
@@ -13,15 +14,20 @@ class Consul {
         this.serviceName = 'mm-movie-service';
         this.serviceId = `${this.serviceName}-${Date.now()}`;
         this.healthCheckUrl = `http://${this.serviceHost}:${this.servicePort}/health`;
-        this.checkInterval = '10s'
+        this.checkInterval = '10s';
     }
 
     async register() {
         const consulUrl = `http://${this.dsHost}:${this.dsPort}/v1/agent/service/register`;
+
         let tags = [];
         if (config.lb_tags) {
-            tags = config.lb_tags.split('\n').map(line => line.trim()).filter(Boolean);
+            tags = config.lb_tags
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean);
         }
+
         const serviceDefinition = {
             Name: this.serviceName,
             ID: this.serviceId,
@@ -35,15 +41,33 @@ class Consul {
             }
         };
 
-        try {
-            const res = await axios.put(consulUrl, serviceDefinition);
-            if (res.status === 200) {
-                this.logger.info(`[CONSUL] Registered service ${this.serviceId} with Consul at ${consulUrl}`);
-            } else {
-                this.logger.error(`[CONSUL] Failed to register service. Status: ${res.status}, Response: ${res.data}`);
+        const maxRetries = 5;
+        let attempt = 0;
+        let success = false;
+
+        while (attempt < maxRetries && !success) {
+            attempt++;
+            try {
+                this.logger.info(`[CONSUL] Attempt ${attempt} to register service...`);
+                const res = await axios.put(consulUrl, serviceDefinition);
+
+                if (res.status === 200) {
+                    this.logger.info(`[CONSUL] ✅ Successfully registered service ${this.serviceId} with Consul`);
+                    success = true;
+                } else {
+                    this.logger.warn(`[CONSUL] ❌ Attempt ${attempt} failed. Status: ${res.status}`);
+                }
+            } catch (err) {
+                this.logger.warn(`[CONSUL] ❌ Attempt ${attempt} failed: ${err.message}`);
             }
-        } catch (err) {
-            this.logger.error(`[CONSUL] Error registering service: ${err.message}`);
+
+            if (!success && attempt < maxRetries) {
+                await this.#delay(2000); // wait 2 seconds before next try
+            }
+        }
+
+        if (!success) {
+            this.logger.error(`[CONSUL] ❌ Failed to register service after ${maxRetries} attempts`);
         }
     }
 
@@ -53,13 +77,18 @@ class Consul {
         try {
             const res = await axios.put(consulUrl);
             if (res.status === 200) {
-                this.logger.info(`[CONSUL] Deregistered service ${this.serviceId} from Consul at ${consulUrl}`);
+                this.logger.info(`[CONSUL] ✅ Deregistered service ${this.serviceId} from Consul`);
             } else {
-                this.logger.error(`[CONSUL] Failed to deregister service. Status: ${res.status}, Response: ${res.data}`);
+                this.logger.error(`[CONSUL] ❌ Failed to deregister. Status: ${res.status}, Response: ${res.data}`);
             }
         } catch (err) {
-            this.logger.error(`[CONSUL] Error deregistering service: ${err.message}`);
+            this.logger.error(`[CONSUL] ❌ Error during deregister: ${err.message}`);
         }
+    }
+
+    // Private helper for delays
+    async #delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
