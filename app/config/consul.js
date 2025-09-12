@@ -41,11 +41,10 @@ class Consul {
             }
         };
 
-        const maxRetries = 5;
         let attempt = 0;
         let success = false;
 
-        while (attempt < maxRetries && !success) {
+        while (!success) {
             attempt++;
             try {
                 this.logger.info(`[CONSUL] Attempt ${attempt} to register service...`);
@@ -61,13 +60,13 @@ class Consul {
                 this.logger.warn(`[CONSUL] ❌ Attempt ${attempt} failed: ${err.message}`);
             }
 
-            if (!success && attempt < maxRetries) {
+            if (!success) {
                 await this.#delay(2000); // wait 2 seconds before next try
             }
         }
 
         if (!success) {
-            this.logger.error(`[CONSUL] ❌ Failed to register service after ${maxRetries} attempts`);
+            this.logger.error(`[CONSUL] ❌ Failed to register service after ${attempt} attempts`);
         }
     }
 
