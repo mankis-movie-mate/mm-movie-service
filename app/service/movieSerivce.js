@@ -231,7 +231,7 @@ const getTop5ByUserRatings = async () => {
 };
 
 const getTop5ByTopGenres = async () => {
-  const topGenresAgg = await this.getTopGenres();
+  const topGenresAgg = await getTopGenres();
 
   const topGenreIds = topGenresAgg.map((g) => g._id);
   const movies = await Movie.find({ genres: { $in: topGenreIds } })
