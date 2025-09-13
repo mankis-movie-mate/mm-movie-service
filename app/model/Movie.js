@@ -38,6 +38,7 @@ const reviewSchema = new mongoose.Schema(
 const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   genres: [{ type: String, ref: 'Genre' }],
+  posterUrl: { type: String },
   director: directorSchema,
   casts: [castSchema],
   synopsis: { type: String },

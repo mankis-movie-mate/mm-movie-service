@@ -108,6 +108,27 @@ router.get('/:id', movieController.getMovieById);
 
 /**
  * @swagger
+ * /top5/{type}:
+ *   get:
+ *     parameters:
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [ratings, genres, third-party]
+ *         description: Type of top 5 to retrieve
+ *     summary: Get top 5 movies by ratings, genres, or third-party data
+ *     tags:
+ *       - Movies
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.get('/top5/:type', movieController.getTop5By);
+
+/**
+ * @swagger
  * /genre/all:
  *   get:
  *     tags:

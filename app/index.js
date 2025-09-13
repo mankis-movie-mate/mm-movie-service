@@ -21,7 +21,7 @@ app.use(cors({
     credentials: true,
 }));
 app.use(express.json());
-app.use(`${base_url}/docs`, swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+app.use(`${base_url}/docs/swagger`, swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use(`${base_url}`, movieRoutes);
 app.use(`${base_url}/manage`, movieManagementRoutes);
 app.get('/health', (req, res) => {

@@ -5,6 +5,9 @@ const InvalidInputError = require('../error/InvalidInputError');
 const Genre = require('../model/Genre');
 const Movie = require('../model/Movie');
 const DuplicateError = require('../error/DuplicateError');
+const { tmdb_api_key } = require('../config/config');
+const { tmdbToMovie } = require('../utils/mapper');
+
 const movieLogger = logger.setTopic('MOVIE_SERVICE');
 
 const getGenreById = async (id) => {
@@ -212,4 +215,68 @@ exports.getAllMovies = async (
     totalPages: totalPages,
     isLast: isLast,
   };
+};
+
+const getTop5ByUserRatings = async () => {
+  try {
+    const topMovies = await Movie.find()
+      .sort({ 'rating.average': -1 })
+      .limit(5)
+      .lean();
+    return topMovies;
+  } catch (error) {
+    movieLogger.error(`Failed to get top 5 movies by user ratings. ${error.message}`);
+    throw new Error(`Failed to get top 5 movies by user ratings.`);
+  }
+};
+
+const getTop5ByTopGenres = async () => {
+  const topGenresAgg = await this.getTopGenres();
+
+  const topGenreIds = topGenresAgg.map((g) => g._id);
+  const movies = await Movie.find({ genres: { $in: topGenreIds } })
+    .sort({ 'rating.average': -1 })
+    .limit(5)
+    .lean();
+
+  return movies;
+};
+
+const getTop5ThirdParty = async () => {
+  const tmdb_url = 'https://api.themoviedb.org/3/movie/top_rated';
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      Authorization: `Bearer ${tmdb_api_key}`
+    }
+  };
+
+  try {
+    const res = await fetch(tmdb_url, options);
+    const json = await res.json();
+
+
+    const movies = await Promise.all(
+      (json.results || []).slice(0, 5).map(async (tmdb) => {
+        const localMovie = await Movie.findOne({ title: tmdb.title }).lean();
+        return tmdbToMovie(tmdb, localMovie);
+      })
+    );
+    return movies;
+  } catch (err) {
+    movieLogger.error(`Failed to fetch top 5 movies from TMDB. ${err.message}`);
+    throw new Error('Failed to fetch top 5 movies from TMDB.');
+  }
+};
+
+exports.getTop5By = async (type) => {
+  switch (type) {
+    case 'ratings':
+      return await getTop5ByUserRatings();
+    case 'genres':
+      return await getTop5ByTopGenres();
+    case 'third-party':
+      return await getTop5ThirdParty();
+  }
 };
