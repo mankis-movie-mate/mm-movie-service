@@ -3,6 +3,7 @@ name: Build movie service
 on:
   push:
     branches:
+      - main
       - dev/release-test
       - dev/running-test
 
