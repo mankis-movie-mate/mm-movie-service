@@ -31,5 +31,6 @@ module.exports = {
   logger_level: process.env.MOVIE_MATE_MOVIE_SERVICE_LOGGER_LEVEL || 'info',
   base_url: process.env.MOVIE_MATE_MOVIE_SERVICE_BASE_URL,
   lb_tags: process.env.MOVIE_MATE_MOVIE_SERVICE_LB_TAGS,
-  allowed_origins: process.env.MOVIE_MATE_MOVIE_SERVICE_ALLOWED_ORIGINS
+  allowed_origins: process.env.MOVIE_MATE_MOVIE_SERVICE_ALLOWED_ORIGINS,
+  tmdb_api_key: process.env.MOVIE_MATE_TMDB_API_KEY,
 };

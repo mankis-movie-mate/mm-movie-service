@@ -12,7 +12,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://${host}:${port}${base_url}`,
+        url: `http://${host}:${port}${base_url}/swagger`,
       },
     ],
   },

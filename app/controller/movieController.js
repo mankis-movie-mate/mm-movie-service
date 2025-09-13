@@ -72,3 +72,23 @@ exports.getAllMovies = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getTop5By = async (req, res, next) => {
+  const { type } = req.params;
+  const allowedTypes = ['ratings', 'genres', 'third-party'];
+  const normalizedType = type.trim().toLowerCase();
+
+  if (!allowedTypes.includes(normalizedType)) {
+    return res.status(400).json({
+      message: `Invalid type parameter. It must be one of: ${allowedTypes.join(', ')}.`,
+    });
+  }
+
+  movieLogger.info(`Getting top 5 movies by ${normalizedType}`);
+  try {
+    const topMovies = await movieService.getTop5By(normalizedType);
+    res.status(200).json(topMovies);
+  } catch (error) {
+    next(error);
+  }
+};
