@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const movieManagementController = require('../controller/movieManagementController');
 
-
 /**
  * @swagger
  * /bulk:
@@ -72,7 +71,6 @@ router.delete('/:id', movieManagementController.deleteMovie);
  *         description: Movie updated
  */
 router.patch('/:id', movieManagementController.updateMovie);
-
 
 /**
  * @swagger

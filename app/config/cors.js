@@ -1,11 +1,11 @@
 const config = require('./config');
 
 function parseOrigins(originsStr) {
-    if (!originsStr) return [];
-    return originsStr
-        .split(',')
-        .map(origin => origin.trim())
-        .filter(Boolean);
+  if (!originsStr) return [];
+  return originsStr
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 }
 
 const allowedOrigins = parseOrigins(config.allowed_origins);
@@ -14,5 +14,5 @@ const allowedOrigins = parseOrigins(config.allowed_origins);
 console.log('[CORS] Allowed origins:', allowedOrigins);
 
 module.exports = {
-    allowedOrigins,
+  allowedOrigins,
 };

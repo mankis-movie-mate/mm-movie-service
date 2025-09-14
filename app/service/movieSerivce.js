@@ -5,8 +5,7 @@ const InvalidInputError = require('../error/InvalidInputError');
 const Genre = require('../model/Genre');
 const Movie = require('../model/Movie');
 const DuplicateError = require('../error/DuplicateError');
-const { tmdb_api_key } = require('../config/config');
-const { tmdbToMovie } = require('../utils/mapper');
+const tmdbService = require('./tmdbService');
 
 const movieLogger = logger.setTopic('MOVIE_SERVICE');
 
@@ -21,13 +20,22 @@ const getGenreById = async (id) => {
 };
 
 const getMovieById = async (id) => {
-  const movie = await Movie.findById({ _id: id });
-  if (!movie) {
-    movieLogger.error(`Movie with id ${id} not found.`);
-    throw new NotFoundError(`Movie with id ${id} not found.`);
+  try {
+    const movie = await Movie.findById({ _id: id });
+    if (!movie) {
+      return await getTmdbMovieExistsById(id);
+    }
+    return movie;
+  } catch (error) {
+    return await getTmdbMovieExistsById(id);
   }
+};
 
-  return movie;
+const getTmdbMovieExistsById = async (id) => {
+  movieLogger.warn(
+    `Movie with id ${id} not found in movie service. Trying to fetch from TMDB...`
+  );
+  return await tmdbService.getMovieById(id);
 };
 
 const isMovieExistsByTitle = async (title) => {
@@ -139,9 +147,13 @@ exports.getMoviesByIds = async (ids) => {
       'The list of movie IDs must be a non-empty array.'
     );
   }
-  const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
 
-  return await Movie.find({ _id: { $in: objectIds } }).lean();
+  const movies = [];
+  for (const id of ids) {
+    const movie = await getMovieById(id);
+    movies.push(movie);
+  }
+  return movies;
 };
 
 exports.updateMovie = async (id, updateData) => {
@@ -225,7 +237,9 @@ const getTop5ByUserRatings = async () => {
       .lean();
     return topMovies;
   } catch (error) {
-    movieLogger.error(`Failed to get top 5 movies by user ratings. ${error.message}`);
+    movieLogger.error(
+      `Failed to get top 5 movies by user ratings. ${error.message}`
+    );
     throw new Error(`Failed to get top 5 movies by user ratings.`);
   }
 };
@@ -242,34 +256,6 @@ const getTop5ByTopGenres = async () => {
   return movies;
 };
 
-const getTop5ThirdParty = async () => {
-  const tmdb_url = 'https://api.themoviedb.org/3/movie/top_rated';
-  const options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      Authorization: `Bearer ${tmdb_api_key}`
-    }
-  };
-
-  try {
-    const res = await fetch(tmdb_url, options);
-    const json = await res.json();
-
-
-    const movies = await Promise.all(
-      (json.results || []).slice(0, 5).map(async (tmdb) => {
-        const localMovie = await Movie.findOne({ title: tmdb.title }).lean();
-        return tmdbToMovie(tmdb, localMovie);
-      })
-    );
-    return movies;
-  } catch (err) {
-    movieLogger.error(`Failed to fetch top 5 movies from TMDB. ${err.message}`);
-    throw new Error('Failed to fetch top 5 movies from TMDB.');
-  }
-};
-
 exports.getTop5By = async (type) => {
   switch (type) {
     case 'ratings':
@@ -277,6 +263,6 @@ exports.getTop5By = async (type) => {
     case 'genres':
       return await getTop5ByTopGenres();
     case 'third-party':
-      return await getTop5ThirdParty();
+      return await tmdbService.getTop5Movies();
   }
 };
