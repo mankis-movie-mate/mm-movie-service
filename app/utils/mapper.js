@@ -29,12 +29,13 @@ const extractGenres = (tmdb) => {
 };
 
 const extractDirector = (credits) => {
-  return credits?.crew
+  const directors = credits?.crew
     ?.filter((c) => c.job === 'Director')
     .map((d) => ({
       firstName: d.name.split(' ')[0],
       lastName: d.name.split(' ').slice(1).join(' '),
-    }))[0];
+    })) || [];
+  return directors[0] || { firstName: '', lastName: '' };
 };
 
 const extractCast = (credits) => {
