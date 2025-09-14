@@ -148,11 +148,7 @@ exports.getMoviesByIds = async (ids) => {
     );
   }
 
-  const movies = [];
-  for (const id of ids) {
-    const movie = await getMovieById(id);
-    movies.push(movie);
-  }
+  const movies = await Promise.all(ids.map((id) => getMovieById(id)));
   return movies;
 };
 
