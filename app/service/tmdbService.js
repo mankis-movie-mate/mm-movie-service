@@ -107,7 +107,7 @@ exports.searchMovies = async (query) => {
     })
   );
   return {
-    elements: elements,
+    elements,
     pageNo: tmdbResults.page,
     pageSize: elements.length,
     totalElements: tmdbResults.total_results,
