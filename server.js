@@ -11,6 +11,7 @@ const server = app.listen(port, async () => {
   logger.info(
     `API documentation at: http://${host}:${port}${base_url}/docs/swagger`
   );
+
   await consul.register();
 });
 
