@@ -6,10 +6,10 @@ const logger = require('./app/middleware/logger');
 
 const consul = new Consul(logger);
 
-const server = app.listen(port, async() => {
+const server = app.listen(port, async () => {
   logger.info(`Server started at: http://${host}:${port}${base_url}`);
   logger.info(
-    `API documentation at: http://${host}:${port}${base_url}/docs/swagger`,
+    `API documentation at: http://${host}:${port}${base_url}/docs/swagger`
   );
 
   await consul.register();
