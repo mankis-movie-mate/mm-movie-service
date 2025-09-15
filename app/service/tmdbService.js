@@ -1,6 +1,6 @@
 const logger = require('../middleware/logger');
 const { tmdb_api_key } = require('../config/config');
-const { tmdbToMovie, tmdbDetailsToMovie } = require('../utils/mapper');
+const { tmdbDetailsToMovie } = require('../utils/mapper');
 
 const tmdbLogger = logger.setTopic('TMDB_SERVICE');
 const TMDB_MOVIE_URL = 'https://api.themoviedb.org/3/movie/';
@@ -81,4 +81,36 @@ const getMovieReviews = async (id) => {
 
   const tmdbReviews = await response.json();
   return tmdbReviews.results || [];
+};
+
+exports.searchMovies = async (query) => {
+  const searchUrl = 'https://api.themoviedb.org/3/search/movie';
+  const params = new URLSearchParams({ query });
+  const response = await fetch(`${searchUrl}?${params}`, req_options);
+  if (!response.ok) {
+    tmdbLogger.error(
+      `Failed to search movies from TMDB: ${response.statusText}`
+    );
+    throw new Error(
+      `Failed to search movies from TMDB: ${response.statusText}`
+    );
+  }
+
+  const tmdbResults = await response.json();
+
+  const elements = await Promise.all(
+    (tmdbResults.results || []).slice(0, 5).map(async (tmdb) => {
+      const credits = await getMovieCredits(tmdb.id);
+      const reviews = null;
+      return tmdbDetailsToMovie(tmdb, credits, reviews);
+    })
+  );
+  return {
+    elements: elements,
+    pageNo: tmdbResults.page,
+    pageSize: elements.length,
+    totalElements: tmdbResults.total_results,
+    totalPages: tmdbResults.total_pages,
+    isLast: tmdbResults.page >= tmdbResults.total_pages,
+  };
 };
