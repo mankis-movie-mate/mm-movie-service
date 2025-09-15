@@ -2,6 +2,7 @@ const Movie = require('../model/Movie');
 const logger = require('../middleware/logger');
 const movieService = require('../service/movieSerivce');
 const movieLogger = logger.setTopic('MOVIE_CONTROLLER');
+const tmdbService = require('../service/tmdbService');
 
 exports.getAllGenres = async (req, res, next) => {
   movieLogger.info('Getting all genres');
@@ -88,6 +89,21 @@ exports.getTop5By = async (req, res, next) => {
   try {
     const topMovies = await movieService.getTop5By(normalizedType);
     res.status(200).json(topMovies);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.searchMovies = async (req, res, next) => {
+  const { query } = req.query;
+  if (!query || query.trim() === '') {
+    return res.status(400).json({ message: 'Query parameter is required.' });
+  }
+
+  movieLogger.info(`Searching movies with query: ${query}`);
+  try {
+    const results = await tmdbService.searchMovies(query);
+    res.status(200).json(results);
   } catch (error) {
     next(error);
   }

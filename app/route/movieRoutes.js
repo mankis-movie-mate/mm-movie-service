@@ -152,4 +152,24 @@ router.get('/genre/all', movieController.getAllGenres);
  */
 router.get('/genre/top', movieController.getTopGenres);
 
+/**
+ * @swagger
+ * /search/movie:
+ *   get:
+ *     tags:
+ *       - Movies
+ *     summary: Search movies by query
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Search query
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.get('/search/movie', movieController.searchMovies);
+
 module.exports = router;

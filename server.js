@@ -12,12 +12,12 @@ const server = app.listen(port, async () => {
     `API documentation at: http://${host}:${port}${base_url}/docs/swagger`
   );
 
-  await consul.register();
+  // await consul.register();
 });
 
 const shutdown = async () => {
   logger.info('[APP] Shutting down...');
-  await consul.deregister();
+  // await consul.deregister();
   server.close(() => process.exit(0));
 };
 
