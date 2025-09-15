@@ -101,7 +101,8 @@ exports.searchMovies = async (query) => {
   const elements = await Promise.all(
     (tmdbResults.results || []).slice(0, 5).map(async (tmdb) => {
       const credits = await getMovieCredits(tmdb.id);
-      const reviews = null;
+      // Reviews are not fetched for search results to optimize performance
+      const reviews = undefined;
       return tmdbDetailsToMovie(tmdb, credits, reviews);
     })
   );
