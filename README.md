@@ -26,7 +26,7 @@ Environment variables are defined in `.env.example`.
 **Run locally:**
 ```bash
 npm install
-npm run start
+npm run dev
 ```
 
 You can also build Docker image
