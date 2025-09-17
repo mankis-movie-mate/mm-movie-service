@@ -262,3 +262,52 @@ exports.getTop5By = async (type) => {
       return await tmdbService.getTop5Movies();
   }
 };
+
+
+exports.searchMovies = async (query, opts = {}) => {
+    if (typeof query !== 'string' || query.trim().length < 2) {
+        throw new Error('Query must be at least 2 characters.');
+    }
+
+    const q = query.trim();
+    const page = Number(opts.page) || 1;
+    const limit = Number(opts.limit) || 20;
+
+    // Case-insensitive regex search on title and synopsis
+    const rx = new RegExp(q, 'i');
+    const filter = { $or: [{ title: rx }, { synopsis: rx }] };
+
+    const [dbResults, total] = await Promise.all([
+        Movie.find(filter)
+            .sort({ 'rating.average': -1, title: 1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean(),
+        Movie.countDocuments(filter),
+    ]);
+
+    if (total > 0) {
+        const totalPages = Math.ceil(total / limit);
+        return {
+            elements: dbResults,
+            pageNo: page,
+            pageSize: limit,
+            totalElements: total,
+            totalPages: totalPages,
+            isLast: page >= totalPages,
+            source: 'db'
+        };
+    }
+
+    // Fallback to TMDB with clean opts
+    movieLogger.info(`[searchMovies] No local results for "${q}", searching TMDB...`);
+
+    // Always sanitize opts for TMDB!
+    const tmdbOpts = {
+        ...opts,
+        page,    // ensure it's an integer, not string!
+        limit    // pass limit as well, if your TMDB service slices the results
+    };
+
+    return await tmdbService.searchMovies(q, tmdbOpts);
+};

@@ -95,16 +95,22 @@ exports.getTop5By = async (req, res, next) => {
 };
 
 exports.searchMovies = async (req, res, next) => {
-  const { query } = req.query;
-  if (!query || query.trim() === '') {
-    return res.status(400).json({ message: 'Query parameter is required.' });
-  }
+    const { query, page, limit } = req.query;
+    if (!query || query.trim() === '') {
+        return res.status(400).json({ message: 'Query parameter is required.' });
+    }
 
-  movieLogger.info(`Searching movies with query: ${query}`);
-  try {
-    const results = await tmdbService.searchMovies(query);
-    res.status(200).json(results);
-  } catch (error) {
-    next(error);
-  }
+    const opts = {
+        page: Number(page) || 1,
+        limit: Number(limit) || 5,
+    };
+
+    movieLogger.info(`[searchMovies] Query="${query}", page=${opts.page}, limit=${opts.limit}`);
+
+    try {
+        const results = await movieService.searchMovies(query, opts);
+        res.status(200).json(results);
+    } catch (error) {
+        next(error);
+    }
 };

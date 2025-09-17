@@ -83,35 +83,38 @@ const getMovieReviews = async (id) => {
   return tmdbReviews.results || [];
 };
 
-exports.searchMovies = async (query) => {
-  const searchUrl = 'https://api.themoviedb.org/3/search/movie';
-  const params = new URLSearchParams({ query });
-  const response = await fetch(`${searchUrl}?${params}`, req_options);
-  if (!response.ok) {
-    tmdbLogger.error(
-      `Failed to search movies from TMDB: ${response.statusText}`
-    );
-    throw new Error(
-      `Failed to search movies from TMDB: ${response.statusText}`
-    );
-  }
+exports.searchMovies = async (query, opts = {}) => {
+    const searchUrl = 'https://api.themoviedb.org/3/search/movie';
+    const params = new URLSearchParams({
+        query,
+        page: String(opts.page),
+        include_adult: 'false',
+        language: opts.language || 'en-US'
+    });
 
-  const tmdbResults = await response.json();
+    const response = await fetch(`${searchUrl}?${params}`, req_options);
+    if (!response.ok) {
+        tmdbLogger.error(`Failed to search movies from TMDB: ${response.statusText}`);
+        throw new Error(`Failed to search movies from TMDB: ${response.statusText}`);
+    }
 
-  const elements = await Promise.all(
-    (tmdbResults.results || []).slice(0, 5).map(async (tmdb) => {
-      const credits = await getMovieCredits(tmdb.id);
-      // Reviews are not fetched for search results to optimize performance
-      const reviews = undefined;
-      return tmdbDetailsToMovie(tmdb, credits, reviews);
-    })
-  );
-  return {
-    elements,
-    pageNo: tmdbResults.page,
-    pageSize: elements.length,
-    totalElements: tmdbResults.total_results,
-    totalPages: tmdbResults.total_pages,
-    isLast: tmdbResults.page >= tmdbResults.total_pages,
-  };
+    const tmdbResults = await response.json();
+    const movies = tmdbResults.results || [];
+    const elements = await Promise.all(
+        movies.slice(0, opts.limit).map(async (tmdb) => {
+            const credits = await getMovieCredits(tmdb.id);
+            // No reviews for performance
+            return tmdbDetailsToMovie(tmdb, credits, undefined);
+        })
+    );
+
+    return {
+        elements,
+        pageNo: tmdbResults.page,
+        pageSize: elements.length,
+        totalElements: tmdbResults.total_results,
+        totalPages: tmdbResults.total_pages,
+        isLast: tmdbResults.page >= tmdbResults.total_pages,
+        source: 'tmdb'
+    };
 };

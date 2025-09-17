@@ -61,7 +61,8 @@ const extractReviews = (tmdbReviews) => {
 };
 
 exports.tmdbDetailsToMovie = (tmdb, credits, reviews) => ({
-  title: tmdb.title,
+    id: String(tmdb.id),
+    title: tmdb.title,
   genres: extractGenres(tmdb),
   posterUrl: tmdb.poster_path
     ? `https://image.tmdb.org/t/p/w500${tmdb.poster_path}`
